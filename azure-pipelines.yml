@@ -1,0 +1,37 @@
+name: Cloud Function
+
+trigger:
+  - master
+
+pr:
+  - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+  # this block is used when we download secure files from devops library
+variables:
+  - name: GCPToken
+    value: lunar-linker-275417-2428c514e9e1.json
+stages:
+  - stage: Development
+    condition: and(succeeded())
+    displayName: Deploy Development
+    jobs:
+      - template: .aptemplates/deploy-cloud-function.yml
+        parameters:
+          env: 'prakalp'
+          ServiceAccountKey: ${{variables.GCPToken}}
+          name: demo-cf
+          Entrypoint: demoEntryPoint
+          Topic: demo-cf-dev
+  - stage: Staging
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    displayName: Deploy Staging
+    jobs:
+      - template: .aptemplates/deploy-cloud-function.yml
+        parameters:
+          env: 'lunar-linker-275417-2428c514e9e1'
+          ServiceAccountKey: ${{variables.GCPToken}}
+          name: demo-cf-staging
+          Entrypoint: demoEntryPoint
+          Topic: demo-cf-staging
