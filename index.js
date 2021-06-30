@@ -6,7 +6,7 @@
  */
 exports.demoEntryPoint = async (event, context) => {
   try {
-    console.log('Entered demoEntryPoint and Done');
+    console.log('Entered Demo Entry  Point and Done');
   } catch (err) {
     console.error(`Error, ${err.message}!`);
   }

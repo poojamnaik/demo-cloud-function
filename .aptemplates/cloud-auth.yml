@@ -1,0 +1,14 @@
+parameters:
+  - name: ServiceAccountKey
+    type: string
+    default: "NOT_DEFINED"
+steps:
+  # Download gcp service account key based on parameter and activiate
+  - task: DownloadSecureFile@1
+    name: authKey
+    displayName: "Download service account key"
+    inputs:
+      secureFile: "${{parameters.ServiceAccountKey}}"
+      retryCount: 2
+  - script: gcloud auth activate-service-account --key-file $(authKey.secureFilePath)
+    displayName: "Activate service account"

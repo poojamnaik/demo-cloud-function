@@ -1,0 +1,39 @@
+parameters:
+  - name: version
+    type: string
+    default: 'latest'
+  - name: env
+    type: string
+    default: 'NOT_DEFINED'
+  - name: ServiceAccountKey
+    type: string
+    default: 'NOT_DEFINED'
+  - name: Name
+    type: string
+    default: 'NOT_DEFINED'
+  - name: Entrypoint
+    type: string
+    default: 'NOT_DEFINED'
+  - name: Runtime
+    type: string
+    default: 'nodejs12'
+  - name: Topic
+    type: string
+jobs:
+  # deploys by taking the output files from the build step and copying to gcp bucket
+  - deployment:
+    displayName: Deploy ${{parameters.Name}}
+    environment: ${{parameters.env}}
+    variables:
+      - group: ${{parameters.env}}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+            - template: ./cloud-auth.yml
+              parameters:
+                ServiceAccountKey: ${{parameters.ServiceAccountKey}}
+            - script: ls -l
+            - script: gcloud functions deploy ${{parameters.Name}} --project=$(GCPProject) --runtime=${{parameters.Runtime}} --entry-point=${{parameters.Entrypoint}} --region=$(GCPRegion) --memory=512MB --trigger-topic=${{parameters.Topic}}  --quiet
+              displayName: gcloud function deploy
