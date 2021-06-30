@@ -14,7 +14,7 @@ variables:
     value: lunar-linker-275417-2428c514e9e1.json
 stages:
   - stage: Development
-    condition: and(succeeded())
+    condition:  and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     displayName: Deploy Development
     jobs:
       - template: .aptemplates/deploy-cloud-function.yml
